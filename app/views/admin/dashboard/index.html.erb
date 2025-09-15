@@ -1,0 +1,31 @@
+<div style="max-width: 800px; margin: 40px auto; padding: 20px;">
+  <h1>⚡ Admin Dashboard</h1>
+  
+  <div style="background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <strong>Welcome, <%= @current_admin.email %>!</strong><br>
+    You are successfully logged in as an Administrator.
+  </div>
+
+  <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+    <h3>Admin Tools</h3>
+    <p>🔧 System administration tools will be added here</p>
+    <p>📊 Event management and user statistics coming soon</p>
+    
+    <hr style="margin: 20px 0;">
+    
+    <h4>Quick Stats</h4>
+    <ul>
+      <li>Total Users: <%= User.count %></li>
+      <li>Admin Users: <%= User.where(role: 1).count %></li>
+      <li>Regular Users: <%= User.where(role: 0).count %></li>
+    </ul>
+  </div>
+
+  <div style="margin-top: 30px; text-align: center;">
+    <%= link_to "← Back to Home", root_path, 
+                style: "color: #666; text-decoration: none; margin-right: 20px;" %>
+    <%= link_to "Logout", destroy_admin_user_session_path, 
+                data: { turbo_method: :delete }, 
+                style: "background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px;" %>
+  </div>
+</div>

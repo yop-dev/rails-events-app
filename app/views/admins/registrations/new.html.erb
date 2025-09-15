@@ -1,0 +1,48 @@
+<div style="max-width: 500px; margin: 40px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+  <h2>⚡ Admin Registration</h2>
+  <p><strong>Note:</strong> Admin registration requires a secret code.</p>
+
+  <%= form_for(resource, as: :admin_user, url: registration_path(:admin_user)) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <div class="field" style="margin-bottom: 15px;">
+      <%= f.label :email %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", 
+                        style: "width: 100%; padding: 8px; margin-top: 5px;" %>
+    </div>
+
+    <div class="field" style="margin-bottom: 15px;">
+      <%= f.label :password %>
+      <%= f.password_field :password, autocomplete: "new-password",
+                          style: "width: 100%; padding: 8px; margin-top: 5px;" %>
+      <% if @minimum_password_length %>
+        <small style="color: #666;">(<%= @minimum_password_length %> characters minimum)</small>
+      <% end %>
+    </div>
+
+    <div class="field" style="margin-bottom: 15px;">
+      <%= f.label :password_confirmation %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password",
+                          style: "width: 100%; padding: 8px; margin-top: 5px;" %>
+    </div>
+
+    <div class="field" style="border: 2px solid #ff6b6b; padding: 15px; background-color: #ffe0e0; border-radius: 5px; margin-bottom: 20px;">
+      <%= f.label :secret_code, "🔐 Admin Secret Code" %>
+      <%= f.password_field :secret_code, placeholder: "Enter admin secret code", 
+                          required: true, 
+                          style: "width: 100%; padding: 8px; margin-top: 5px;" %>
+      <small style="color: #666; display: block; margin-top: 5px;">
+        Contact system administrator for the secret code
+      </small>
+    </div>
+
+    <div class="actions" style="text-align: center;">
+      <%= f.submit "Register as Admin", 
+                   style: "background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer;" %>
+    </div>
+  <% end %>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <%= link_to "← Back to Home", root_path, style: "color: #666; text-decoration: none;" %>
+  </div>
+</div>
