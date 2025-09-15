@@ -1,71 +1,576 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Event Registration System</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    .container { max-width: 800px; margin: 0 auto; text-align: center; }
-    .user-options { display: flex; justify-content: space-around; margin-top: 40px; }
-    .option { border: 1px solid #ddd; padding: 20px; border-radius: 5px; }
-    .btn { padding: 10px 20px; margin: 5px; text-decoration: none; border-radius: 3px; display: inline-block; }
-    .btn-primary { background-color: #007bff; color: white; }
-    .btn-danger { background-color: #dc3545; color: white; }
-    .btn-secondary { background-color: #6c757d; color: white; }
-    .btn-warning { background-color: #ffc107; color: black; }
-    .user-info { background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-  </style>
-</head>
-<body>
-  <div class="container">
+<div class="home-page">
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-4"></div>
+  </div>
+  
+  <div class="home-container">
     <% if user_signed_in? %>
-      <!-- Signed in user dashboard -->
-      <div class="user-info">
-        <h1>Welcome back, <%= current_user.email %>!</h1>
-        <p>You are signed in as: <strong><%= current_user.admin? ? 'Administrator' : 'Regular User' %></strong></p>
-        
-        <div style="margin-top: 15px;">
-          <% if current_user.admin? %>
-            <%= link_to "Go to Admin Dashboard", admin_root_path, class: "btn btn-danger" %>
-          <% else %>
-            <p>🎉 Ready to create and manage events!</p>
-            <!-- Events functionality will be added here -->
-          <% end %>
+      <!-- Authenticated User Dashboard -->
+      <div class="user-dashboard">
+        <div class="welcome-card glass">
+          <div class="welcome-header">
+            <div class="user-avatar">
+              <span class="avatar-icon"><%= current_user.admin? ? '⚡' : '👤' %></span>
+            </div>
+            <div class="welcome-content">
+              <h1 class="welcome-title">
+                Welcome back,
+                <span class="user-name"><%= current_user.email.split('@').first.capitalize %></span>
+              </h1>
+              <div class="user-role">
+                <span class="role-badge <%= current_user.admin? ? 'admin' : 'user' %>">
+                  <span class="role-icon"><%= current_user.admin? ? '⚡' : '👤' %></span>
+                  <%= current_user.admin? ? 'Administrator' : 'Regular User' %>
+                </span>
+              </div>
+            </div>
+          </div>
           
-          <%= link_to "Logout", destroy_user_session_path, 
-                      data: { 
-                        turbo_method: :delete,
-                        turbo_confirm: "Are you sure you want to log out?" 
-                      }, 
-                      class: "btn btn-secondary" %>
+          <div class="dashboard-actions">
+            <% if current_user.admin? %>
+              <%= link_to admin_root_path, class: "action-btn primary" do %>
+                <span class="btn-icon">📊</span>
+                <span class="btn-text">Admin Dashboard</span>
+                <span class="btn-arrow">→</span>
+              <% end %>
+            <% else %>
+              <div class="coming-soon">
+                <span class="soon-icon">🎉</span>
+                <p>Event management features coming soon!</p>
+              </div>
+            <% end %>
+            
+            <%= link_to destroy_user_session_path, 
+                        data: { 
+                          turbo_method: :delete,
+                          turbo_confirm: "Are you sure you want to log out?" 
+                        },
+                        class: "action-btn secondary" do %>
+              <span class="btn-icon">🚀</span>
+              <span class="btn-text">Sign Out</span>
+              <span class="btn-arrow">→</span>
+            <% end %>
+          </div>
         </div>
       </div>
       
     <% else %>
-      <!-- Guest user landing page -->
-      <h1>Event Registration System</h1>
-      <p>Welcome! Please choose your account type to continue.</p>
-
-      <div class="user-options">
-        <div class="option">
-          <h3>👤 Regular User</h3>
-          <p>Create and manage events<br>Register for events</p>
-          <div>
-            <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary" %>
-            <%= link_to "Sign In", new_user_session_path, class: "btn btn-secondary" %>
+      <!-- Guest Landing Page -->
+      <div class="landing-page">
+        <div class="hero-section">
+          <div class="hero-content">
+            <h1 class="hero-title">
+              <span class="title-line">Event</span>
+              <span class="title-line gradient">Registration</span>
+              <span class="title-line">System</span>
+            </h1>
+            <p class="hero-subtitle">
+              Create, manage, and attend amazing events with our modern platform
+            </p>
           </div>
         </div>
-
-        <div class="option">
-        <h3>⚡ Administrator</h3>
-        <p>Manage all events and users<br>System administration</p>
-        <div>
-            <%= link_to "Admin Register", new_admin_user_registration_path, class: "btn btn-danger" %>
-            <%= link_to "Admin Login", new_admin_user_session_path, class: "btn btn-warning" %>
+        
+        <div class="auth-options">
+          <div class="option-card glass" data-type="user">
+            <div class="option-header">
+              <div class="option-icon">
+                <span class="icon">👤</span>
+              </div>
+              <h3 class="option-title">Regular User</h3>
+            </div>
+            <div class="option-content">
+              <ul class="feature-list">
+                <li><span class="feature-icon">✓</span> Create and manage events</li>
+                <li><span class="feature-icon">✓</span> Register for events</li>
+                <li><span class="feature-icon">✓</span> Event notifications</li>
+              </ul>
+            </div>
+            <div class="option-actions">
+              <%= link_to new_user_registration_path, class: "auth-btn primary" do %>
+                <span class="btn-text">Sign Up</span>
+                <span class="btn-arrow">→</span>
+              <% end %>
+              <%= link_to new_user_session_path, class: "auth-btn secondary" do %>
+                <span class="btn-text">Sign In</span>
+                <span class="btn-arrow">→</span>
+              <% end %>
+            </div>
+          </div>
+          
+          <div class="option-card glass" data-type="admin">
+            <div class="option-header">
+              <div class="option-icon admin">
+                <span class="icon">⚡</span>
+              </div>
+              <h3 class="option-title">Administrator</h3>
+            </div>
+            <div class="option-content">
+              <ul class="feature-list">
+                <li><span class="feature-icon">✓</span> Manage all events & users</li>
+                <li><span class="feature-icon">✓</span> System administration</li>
+                <li><span class="feature-icon">✓</span> Analytics & reporting</li>
+              </ul>
+            </div>
+            <div class="option-actions">
+              <%= link_to new_admin_user_registration_path, class: "auth-btn danger" do %>
+                <span class="btn-text">Admin Register</span>
+                <span class="btn-arrow">→</span>
+              <% end %>
+              <%= link_to new_admin_user_session_path, class: "auth-btn warning" do %>
+                <span class="btn-text">Admin Login</span>
+                <span class="btn-arrow">→</span>
+              <% end %>
+            </div>
+          </div>
         </div>
-        </div>
-
       </div>
     <% end %>
   </div>
-</body>
-</html>
+</div>
+
+<style>
+  .home-page {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+  }
+  
+  .bg-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  
+  .bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(64, 64, 64, 0.05) 0%, transparent 70%);
+    animation: float 8s ease-in-out infinite;
+  }
+  
+  .shape-1 {
+    width: 400px;
+    height: 400px;
+    top: -200px;
+    right: -200px;
+    animation-delay: 0s;
+  }
+  
+  .shape-2 {
+    width: 300px;
+    height: 300px;
+    bottom: -150px;
+    left: -150px;
+    animation-delay: 2s;
+  }
+  
+  .shape-3 {
+    width: 250px;
+    height: 250px;
+    top: 40%;
+    left: -125px;
+    animation-delay: 4s;
+  }
+  
+  .shape-4 {
+    width: 200px;
+    height: 200px;
+    top: 20%;
+    right: -100px;
+    animation-delay: 6s;
+  }
+  
+  .home-container {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  
+  /* Authenticated User Dashboard */
+  .user-dashboard {
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .welcome-card {
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .welcome-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .avatar-icon {
+    font-size: 36px;
+  }
+  
+  .welcome-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    line-height: 1.2;
+  }
+  
+  .user-name {
+    background: linear-gradient(135deg, #ffc107 0%, #ff6b6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .user-role {
+    margin-top: 15px;
+  }
+  
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .role-badge.admin {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+  }
+  
+  .role-badge.user {
+    background: rgba(64, 64, 64, 0.2);
+    border: 1px solid rgba(64, 64, 64, 0.3);
+    color: var(--text-secondary);
+  }
+  
+  .dashboard-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+    color: #000;
+  }
+  
+  .action-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+  }
+  
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn-icon {
+    font-size: 20px;
+  }
+  
+  .btn-text {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .btn-arrow {
+    font-size: 16px;
+    opacity: 0.7;
+  }
+  
+  .coming-soon {
+    padding: 20px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .soon-icon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  /* Guest Landing Page */
+  .landing-page {
+    width: 100%;
+    max-width: 1000px;
+  }
+  
+  .hero-section {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .hero-title {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 0.9;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .title-line {
+    display: block;
+    color: var(--text-primary);
+  }
+  
+  .title-line.gradient {
+    background: linear-gradient(135deg, #ffc107 0%, #ff6b6b 50%, #6c5ce7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 3s ease-in-out infinite;
+  }
+  
+  .hero-subtitle {
+    font-size: 20px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  
+  .auth-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  
+  .option-card {
+    padding: 40px 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .option-card[data-type="admin"]::before {
+    background: linear-gradient(90deg, transparent, var(--warning), transparent);
+  }
+  
+  .option-card:hover::before {
+    left: 100%;
+  }
+  
+  .option-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+  
+  .option-header {
+    margin-bottom: 30px;
+  }
+  
+  .option-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+  }
+  
+  .option-icon.admin {
+    border-color: rgba(255, 193, 7, 0.3);
+    background: rgba(255, 193, 7, 0.1);
+  }
+  
+  .option-icon .icon {
+    font-size: 36px;
+  }
+  
+  .option-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  
+  .option-content {
+    margin-bottom: 30px;
+  }
+  
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+  }
+  
+  .feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  
+  .feature-icon {
+    color: var(--success);
+    font-weight: bold;
+    font-size: 12px;
+  }
+  
+  .option-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .auth-btn.primary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--hover) 100%);
+    color: var(--text-primary);
+  }
+  
+  .auth-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+  }
+  
+  .auth-btn.danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+    color: white;
+  }
+  
+  .auth-btn.warning {
+    background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+    color: #000;
+  }
+  
+  .auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-30px) rotate(180deg);
+    }
+  }
+  
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 48px;
+    }
+    
+    .hero-subtitle {
+      font-size: 18px;
+    }
+    
+    .auth-options {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .option-card {
+      padding: 30px 20px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .home-container {
+      padding: 20px 15px;
+    }
+    
+    .hero-title {
+      font-size: 36px;
+    }
+    
+    .hero-subtitle {
+      font-size: 16px;
+    }
+    
+    .welcome-card {
+      padding: 30px 20px;
+    }
+    
+    .welcome-title {
+      font-size: 28px;
+    }
+  }
+</style>

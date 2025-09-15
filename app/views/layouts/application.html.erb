@@ -1,28 +1,170 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Event Registration App</title>
+    <title>Events App</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    
+    <style>
+      :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #1a1a1a;
+        --bg-tertiary: #2a2a2a;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --text-muted: #666666;
+        --accent: #333333;
+        --hover: #404040;
+        --success: #28a745;
+        --danger: #dc3545;
+        --warning: #ffc107;
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        color: var(--text-primary);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+      
+      .flash-messages {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+      }
+      
+      .flash-message {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        animation: slideIn 0.3s ease-out;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .flash-notice {
+        background: rgba(40, 167, 69, 0.2);
+        border-color: rgba(40, 167, 69, 0.3);
+        color: #d4edda;
+      }
+      
+      .flash-alert {
+        background: rgba(220, 53, 69, 0.2);
+        border-color: rgba(220, 53, 69, 0.3);
+        color: #f8d7da;
+      }
+      
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      
+      .glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+      }
+      
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+      }
+      
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--hover) 100%);
+        color: var(--text-primary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      
+      .btn-danger {
+        background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+        color: white;
+      }
+      
+      .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+      }
+      
+      .btn-warning {
+        background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+        color: #212529;
+        font-weight: 600;
+      }
+      
+      .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(255, 193, 7, 0.3);
+      }
+    </style>
   </head>
 
   <body>
-    <% if notice %>
-      <div style="background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 10px; margin: 10px;">
-        <%= notice %>
-      </div>
-    <% end %>
-    
-    <% if alert %>
-      <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 10px; margin: 10px;">
-        <%= alert %>
-      </div>
-    <% end %>
+    <div class="flash-messages">
+      <% if notice %>
+        <div class="flash-message flash-notice">
+          <%= notice %>
+        </div>
+      <% end %>
+      
+      <% if alert %>
+        <div class="flash-message flash-alert">
+          <%= alert %>
+        </div>
+      <% end %>
+    </div>
 
     <%= yield %>
+    
+    <script>
+      // Auto-hide flash messages after 5 seconds
+      setTimeout(() => {
+        const messages = document.querySelectorAll('.flash-message');
+        messages.forEach(msg => {
+          msg.style.animation = 'slideIn 0.3s ease-out reverse';
+          setTimeout(() => msg.remove(), 300);
+        });
+      }, 5000);
+    </script>
   </body>
 </html>
