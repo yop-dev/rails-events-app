@@ -83,11 +83,11 @@
       <div class="user-section">
         <div class="user-info">
           <div class="user-avatar">
-            <span class="avatar-text"><%= current_user.admin? ? '⚡' : '👤' %></span>
+            <span class="avatar-text"><%= current_authenticated_user.admin? ? '⚡' : '👤' %></span>
           </div>
           <div class="user-details">
-            <div class="user-name"><%= current_user.email.split('@').first.capitalize %></div>
-            <div class="user-role"><%= current_user.admin? ? 'Admin' : 'User' %></div>
+            <div class="user-name"><%= current_authenticated_user.email.split('@').first.capitalize %></div>
+            <div class="user-role"><%= current_authenticated_user.admin? ? 'Admin' : 'User' %></div>
           </div>
         </div>
         
@@ -106,7 +106,7 @@
             <% end %>
           <% end %>
           
-          <%= link_to destroy_user_session_path, 
+          <%= link_to (current_admin_user ? destroy_admin_user_session_path : destroy_user_session_path), 
                       data: { 
                         turbo_method: :delete,
                         turbo_confirm: "Are you sure you want to log out?" 

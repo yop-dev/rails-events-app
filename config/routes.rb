@@ -29,6 +29,16 @@ Rails.application.routes.draw do
   
   namespace :admin do
     root 'dashboard#index'
+    resources :events, only: [:index, :destroy] do
+      collection do
+        delete :bulk_destroy
+      end
+    end
+    resources :registrations, only: [:index, :destroy] do
+      collection do
+        delete :bulk_destroy
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

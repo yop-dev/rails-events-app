@@ -28,4 +28,12 @@ class ApplicationController < ActionController::Base
   def admin_required
     redirect_to root_path, alert: 'Admin access required.' unless current_user&.admin?
   end
+  
+  # Helper method to get the current user regardless of authentication scope
+  def current_authenticated_user
+    current_admin_user || current_user
+  end
+  
+  # Make it available to views
+  helper_method :current_authenticated_user
 end

@@ -30,7 +30,7 @@
                     <span class="meta-icon">👥</span>
                     <span class="meta-text"><%= pluralize(event.registrations.count, 'attendee') %></span>
                   </div>
-                  <% if current_user.admin? %>
+                  <% if current_authenticated_user.admin? %>
                     <div class="meta-item">
                       <span class="meta-icon">👤</span>
                       <span class="meta-text">By: <%= event.user.email.split('@').first.capitalize %></span>
@@ -73,7 +73,7 @@
       <% else %>
         <div class="empty-state glass">
           <div class="empty-icon">🎭</div>
-          <% if current_user.admin? %>
+          <% if current_authenticated_user.admin? %>
             <h3 class="empty-title">No Events in System</h3>
             <p class="empty-description">No users have created any events yet. As an admin, you can create events or wait for users to create them.</p>
           <% else %>
@@ -83,7 +83,7 @@
           <%= link_to new_event_path, class: "empty-action-btn" do %>
             <span class="btn-icon">✨</span>
             <span class="btn-text">
-              <%= current_user.admin? ? 'Create Event' : 'Create Your First Event' %>
+              <%= current_authenticated_user.admin? ? 'Create Event' : 'Create Your First Event' %>
             </span>
             <span class="btn-arrow">→</span>
           <% end %>
@@ -94,6 +94,23 @@
 </div>
 
 <style>
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8b8;
+    --text-muted: #888888;
+    --warning: #ffc107;
+    --success: #28a745;
+    --danger: #dc3545;
+  }
+  
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
   .events-page {
     min-height: 100vh;
     position: relative;

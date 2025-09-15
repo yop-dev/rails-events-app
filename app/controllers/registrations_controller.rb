@@ -1,5 +1,5 @@
 class RegistrationsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_any_user!
   before_action :set_registration, only: [:edit, :update, :destroy]
   before_action :set_event, only: [:create]
 
@@ -44,14 +44,20 @@ class RegistrationsController < ApplicationController
   end
 
   def set_event
-    @event = Event.for_user(current_user).find(params[:event_id])
+    @event = Event.for_user(current_authenticated_user).find(params[:event_id])
   rescue ActiveRecord::RecordNotFound
     redirect_to events_path, alert: 'Event not found or access denied.'
   end
 
   def ensure_event_owner_or_admin
-    unless current_user.admin? || @event.user == current_user
+    unless current_authenticated_user.admin? || @event.user == current_authenticated_user
       redirect_to events_path, alert: 'Access denied. You can only manage registrations for your own events.'
+    end
+  end
+  
+  def authenticate_any_user!
+    unless user_signed_in? || admin_user_signed_in?
+      redirect_to root_path, alert: 'Please sign in to continue.'
     end
   end
 

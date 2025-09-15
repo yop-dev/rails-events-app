@@ -1,7 +1,7 @@
 <%= render 'shared/events_navigation' %>
 
 <div class="form-container">
-  <%= form_with(model: registration, local: true, html: { class: "registration-form glass" }) do |form| %>
+  <%= form_with url: "/event_registrations/#{registration.id}", method: :patch, local: true, html: { class: "registration-form glass" } do |form| %>
     <div class="form-header">
       <h2 class="form-title">
         <span class="form-icon">✏️</span>
@@ -32,6 +32,7 @@
             <span class="label-text">Full Name *</span>
           <% end %>
           <%= form.text_field :attendee_name, 
+                              value: registration.attendee_name,
                               class: "form-input", 
                               placeholder: "Enter full name...",
                               required: true %>
@@ -45,6 +46,7 @@
             <span class="label-text">Email Address *</span>
           <% end %>
           <%= form.email_field :attendee_email, 
+                               value: registration.attendee_email,
                                class: "form-input", 
                                placeholder: "Enter email address...",
                                required: true %>
@@ -64,6 +66,13 @@
 </div>
 
 <style>
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8b8;
+    --text-muted: #888888;
+    --warning: #ffc107;
+  }
+  
   .form-container {
     min-height: calc(100vh - 120px);
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);

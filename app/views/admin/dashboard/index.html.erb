@@ -71,10 +71,10 @@
       <div class="stat-card glass" data-stat="events">
         <div class="stat-icon">📅</div>
         <div class="stat-content">
-          <div class="stat-number">0</div>
+          <div class="stat-number"><%= @total_events %></div>
           <div class="stat-label">Events</div>
         </div>
-        <div class="stat-trend">New</div>
+        <div class="stat-trend">+<%= @total_registrations %> reg</div>
       </div>
     </div>
 
@@ -86,14 +86,14 @@
           <div class="action-icon">📊</div>
           <h3>Event Management</h3>
           <p>Manage all events and registrations</p>
-          <button class="btn btn-primary" disabled>Coming Soon</button>
+          <%= link_to "Manage Events", admin_events_path, class: "btn btn-primary" %>
         </div>
         
         <div class="action-card glass">
           <div class="action-icon">👥</div>
-          <h3>User Management</h3>
-          <p>Manage user accounts and permissions</p>
-          <button class="btn btn-primary" disabled>Coming Soon</button>
+          <h3>Registration Management</h3>
+          <p>Manage event registrations and attendees</p>
+          <%= link_to "Manage Registrations", admin_registrations_path, class: "btn btn-primary" %>
         </div>
         
         <div class="action-card glass">
@@ -110,7 +110,7 @@
 <style>
   .admin-dashboard {
     min-height: 100vh;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+    background: linear-gradient(135deg, #f5f5f5 0%, #e9ecef 50%, #f0f0f0 100%);
   }
   
   .admin-nav {

@@ -46,7 +46,7 @@
               </div>
             </div>
             
-            <% if current_user.admin? || @event.user != current_user %>
+            <% if current_authenticated_user.admin? || @event.user != current_authenticated_user %>
               <div class="meta-item">
                 <span class="meta-icon">👤</span>
                 <div class="meta-content">
