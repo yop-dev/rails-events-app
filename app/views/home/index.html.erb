@@ -38,10 +38,11 @@
                 <span class="btn-arrow">→</span>
               <% end %>
             <% else %>
-              <div class="coming-soon">
-                <span class="soon-icon">🎉</span>
-                <p>Event management features coming soon!</p>
-              </div>
+              <%= link_to events_path, class: "action-btn primary" do %>
+                <span class="btn-icon">🎉</span>
+                <span class="btn-text">Manage Events</span>
+                <span class="btn-arrow">→</span>
+              <% end %>
             <% end %>
             
             <%= link_to destroy_user_session_path, 

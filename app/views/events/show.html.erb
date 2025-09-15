@@ -1,0 +1,833 @@
+<div class="event-show-page">
+  <%= render 'shared/events_navigation' %>
+  
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+  </div>
+  
+  <div class="container">
+    <!-- Event Details Header -->
+    <div class="event-header glass">
+      
+      <div class="event-details">
+        <div class="event-date-large">
+          <span class="date-month"><%= @event.date.strftime("%b") %></span>
+          <span class="date-day"><%= @event.date.strftime("%d") %></span>
+          <span class="date-year"><%= @event.date.strftime("%Y") %></span>
+        </div>
+        
+        <div class="event-content">
+          <h1 class="event-title"><%= @event.name %></h1>
+          
+          <div class="event-meta">
+            <div class="meta-item">
+              <span class="meta-icon">📅</span>
+              <div class="meta-content">
+                <span class="meta-label">Date & Time</span>
+                <span class="meta-value"><%= @event.date.strftime("%B %d, %Y at %I:%M %p") %></span>
+              </div>
+            </div>
+            
+            <div class="meta-item">
+              <span class="meta-icon">📍</span>
+              <div class="meta-content">
+                <span class="meta-label">Location</span>
+                <span class="meta-value"><%= @event.location %></span>
+              </div>
+            </div>
+            
+            <div class="meta-item">
+              <span class="meta-icon">👥</span>
+              <div class="meta-content">
+                <span class="meta-label">Attendees</span>
+                <span class="meta-value"><%= pluralize(@registrations.count, 'person') %> registered</span>
+              </div>
+            </div>
+            
+            <% if current_user.admin? || @event.user != current_user %>
+              <div class="meta-item">
+                <span class="meta-icon">👤</span>
+                <div class="meta-content">
+                  <span class="meta-label">Organizer</span>
+                  <span class="meta-value"><%= @event.user.email.split('@').first.capitalize %></span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+          <% if @event.description.present? %>
+            <div class="event-description">
+              <h3 class="description-title">
+                <span class="title-icon">📝</span>
+                Description
+              </h3>
+              <p class="description-text"><%= simple_format(@event.description) %></p>
+            </div>
+          <% end %>
+          
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <%= link_to edit_event_path(@event), class: "quick-action-btn edit", title: "Edit Event" do %>
+              <span class="btn-icon">✏️</span>
+              <span class="btn-text">Edit</span>
+            <% end %>
+            
+            <%= link_to event_path(@event), 
+                        method: :delete,
+                        data: { 
+                          turbo_method: :delete,
+                          turbo_confirm: "Are you sure you want to delete '#{@event.name}'?" 
+                        },
+                        class: "quick-action-btn delete",
+                        title: "Delete Event" do %>
+              <span class="btn-icon">🗑️</span>
+              <span class="btn-text">Delete</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Registration Section -->
+    <div class="registration-section">
+      <!-- Add New Registration Form -->
+      <div class="registration-form-card glass">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="title-icon">🎫</span>
+            Register for This Event
+          </h2>
+        </div>
+        
+        <%= form_with(model: [@event, @registration], url: event_event_registrations_path(@event), local: true, html: { class: "registration-form" }) do |form| %>
+          <% if @registration.errors.any? %>
+            <div class="error-messages">
+              <div class="error-header">
+                <span class="error-icon">⚠️</span>
+                <span class="error-text"><%= pluralize(@registration.errors.count, "error") %> prohibited this registration:</span>
+              </div>
+              <ul class="error-list">
+                <% @registration.errors.full_messages.each do |message| %>
+                  <li class="error-item"><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <%= form.label :attendee_name, class: "form-label" do %>
+                <span class="label-icon">👤</span>
+                <span class="label-text">Full Name *</span>
+              <% end %>
+              <%= form.text_field :attendee_name, 
+                                  class: "form-input", 
+                                  placeholder: "Enter your full name...",
+                                  required: true %>
+            </div>
+            
+            <div class="form-group">
+              <%= form.label :attendee_email, class: "form-label" do %>
+                <span class="label-icon">📧</span>
+                <span class="label-text">Email Address *</span>
+              <% end %>
+              <%= form.email_field :attendee_email, 
+                                   class: "form-input", 
+                                   placeholder: "Enter your email...",
+                                   required: true %>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <%= form.submit "Register Now", class: "register-btn" %>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Attendees List -->
+      <div class="attendees-card glass">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="title-icon">👥</span>
+            Event Attendees
+            <span class="attendee-count">(<%= @registrations.count %>)</span>
+          </h2>
+        </div>
+        
+        <div class="attendees-content">
+          <% if @registrations.any? %>
+            <div class="attendees-list">
+              <% @registrations.each_with_index do |registration, index| %>
+                <div class="attendee-item">
+                  <div class="attendee-avatar">
+                    <span class="avatar-text"><%= registration.attendee_name.split.map(&:first).join.upcase %></span>
+                  </div>
+                  
+                  <div class="attendee-info">
+                    <div class="attendee-name"><%= registration.attendee_name %></div>
+                    <div class="attendee-email"><%= registration.attendee_email %></div>
+                    <div class="attendee-meta">Registered <%= time_ago_in_words(registration.created_at) %> ago</div>
+                  </div>
+                  
+                  <div class="attendee-actions">
+                    <%= link_to edit_event_registration_path(registration), class: "attendee-action-btn edit" do %>
+                      <span class="btn-icon">✏️</span>
+                    <% end %>
+                    
+                    <%= link_to event_registration_path(registration), 
+                                method: :delete,
+                                data: { 
+                                  turbo_method: :delete,
+                                  turbo_confirm: "Are you sure you want to remove #{registration.attendee_name}'s registration?" 
+                                },
+                                class: "attendee-action-btn delete" do %>
+                      <span class="btn-icon">🗑️</span>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="empty-attendees">
+              <div class="empty-icon">🎭</div>
+              <h3 class="empty-title">No Attendees Yet</h3>
+              <p class="empty-description">Be the first to register for this amazing event!</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .event-show-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+    padding-bottom: 40px;
+    position: relative;
+  }
+  
+  .bg-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(64, 64, 64, 0.05) 0%, transparent 70%);
+    animation: float 8s ease-in-out infinite;
+  }
+  
+  .shape-1 {
+    width: 400px;
+    height: 400px;
+    top: 20%;
+    right: -200px;
+    animation-delay: 0s;
+  }
+  
+  .shape-2 {
+    width: 300px;
+    height: 300px;
+    bottom: 10%;
+    left: -150px;
+    animation-delay: 4s;
+  }
+  
+  .container {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .event-header {
+    padding: 40px;
+    margin-bottom: 40px;
+  }
+  
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: translateX(-3px);
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .action-btn.edit {
+    background: rgba(64, 64, 64, 0.3);
+    color: var(--text-secondary);
+  }
+  
+  .action-btn.edit:hover {
+    background: rgba(64, 64, 64, 0.5);
+    color: var(--text-primary);
+  }
+  
+  .action-btn.delete {
+    background: rgba(220, 53, 69, 0.2);
+    color: #f8d7da;
+    border-color: rgba(220, 53, 69, 0.3);
+  }
+  
+  .action-btn.delete:hover {
+    background: rgba(220, 53, 69, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .event-details {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+  }
+  
+  .event-date-large {
+    background: rgba(255, 193, 7, 0.1);
+    border: 2px solid rgba(255, 193, 7, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .date-month {
+    font-size: 16px;
+    color: var(--warning);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .date-day {
+    font-size: 40px;
+    color: var(--text-primary);
+    font-weight: 800;
+    line-height: 1;
+    margin: 8px 0;
+  }
+  
+  .date-year {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  .event-content {
+    flex: 1;
+  }
+  
+  .event-title {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 25px 0;
+    line-height: 1.2;
+  }
+  
+  .event-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .meta-icon {
+    font-size: 20px;
+    margin-top: 2px;
+  }
+  
+  .meta-content {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .meta-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  
+  .meta-value {
+    font-size: 16px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  
+  .event-description {
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .description-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .description-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  .quick-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  
+  .quick-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .quick-action-btn.edit {
+    background: rgba(64, 64, 64, 0.3);
+    color: var(--text-secondary);
+  }
+  
+  .quick-action-btn.edit:hover {
+    background: rgba(64, 64, 64, 0.5);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+  }
+  
+  .quick-action-btn.delete {
+    background: rgba(220, 53, 69, 0.2);
+    color: #f8d7da;
+    border-color: rgba(220, 53, 69, 0.3);
+  }
+  
+  .quick-action-btn.delete:hover {
+    background: rgba(220, 53, 69, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .registration-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  
+  .registration-form-card,
+  .attendees-card {
+    padding: 30px;
+  }
+  
+  .card-header {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .attendee-count {
+    font-size: 16px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  
+  .registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .error-messages {
+    padding: 15px 20px;
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .error-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .error-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f8d7da;
+  }
+  
+  .error-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .error-item {
+    color: #f8d7da;
+    font-size: 13px;
+    padding: 2px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+  
+  .error-item::before {
+    content: '•';
+    position: absolute;
+    left: 8px;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+  
+  .form-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 16px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: rgba(255, 193, 7, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+  }
+  
+  .form-input::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .register-btn {
+    background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+    color: #000;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+  }
+  
+  .register-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 193, 7, 0.3);
+  }
+  
+  .attendees-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .attendee-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .attendee-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
+  }
+  
+  .attendee-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: #000;
+  }
+  
+  .attendee-info {
+    flex: 1;
+  }
+  
+  .attendee-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  
+  .attendee-email {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+  
+  .attendee-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  
+  .attendee-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .attendee-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .attendee-action-btn.edit {
+    background: rgba(64, 64, 64, 0.3);
+    color: var(--text-secondary);
+  }
+  
+  .attendee-action-btn.edit:hover {
+    background: rgba(64, 64, 64, 0.5);
+    color: var(--text-primary);
+  }
+  
+  .attendee-action-btn.delete {
+    background: rgba(220, 53, 69, 0.2);
+    color: #f8d7da;
+    border-color: rgba(220, 53, 69, 0.3);
+  }
+  
+  .attendee-action-btn.delete:hover {
+    background: rgba(220, 53, 69, 0.3);
+  }
+  
+  .empty-attendees {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  
+  .empty-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    opacity: 0.7;
+  }
+  
+  .empty-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+  
+  .empty-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .registration-section {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .event-show-page {
+      padding: 20px 0;
+    }
+    
+    .container {
+      padding: 0 15px;
+    }
+    
+    .event-header {
+      padding: 30px 20px;
+    }
+    
+    .header-actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 15px;
+    }
+    
+    .action-buttons {
+      justify-content: center;
+    }
+    
+    .event-details {
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .event-date-large {
+      align-self: flex-start;
+    }
+    
+    .event-title {
+      font-size: 32px;
+    }
+    
+    .registration-form-card,
+    .attendees-card {
+      padding: 25px 20px;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .event-title {
+      font-size: 28px;
+    }
+    
+    .card-title {
+      font-size: 20px;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    
+    .attendee-item {
+      padding: 15px;
+    }
+    
+    .attendee-name {
+      font-size: 16px;
+    }
+    
+    .quick-actions {
+      justify-content: center;
+      margin-top: 20px;
+    }
+    
+    .quick-action-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+  }
+</style>

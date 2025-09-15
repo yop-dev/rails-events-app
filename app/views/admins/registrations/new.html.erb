@@ -22,8 +22,8 @@
       </div>
       
       <div class="auth-form">
-        <%= form_for(resource, as: :admin_user, url: registration_path(:admin_user), 
-                     html: { class: "registration-form" }) do |f| %>
+        <%= form_with(model: resource, scope: :admin_user, url: admin_user_registration_path, 
+                       local: true, html: { class: "registration-form", data: { turbo: false } }) do |f| %>
           
           <!-- Error Messages -->
           <% if resource.errors.any? %>

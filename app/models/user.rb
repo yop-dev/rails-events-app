@@ -2,6 +2,9 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  # Associations
+  has_many :events, dependent: :destroy
+
   # Define user roles (simple approach)
   def admin?
     role == 1

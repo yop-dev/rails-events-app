@@ -1,0 +1,335 @@
+<%= render 'shared/events_navigation' %>
+
+<div class="form-container">
+  <%= form_with(model: event, local: true, html: { class: "event-form glass" }) do |form| %>
+    <div class="form-header">
+      <h2 class="form-title">
+        <span class="form-icon"><%= event.persisted? ? '✏️' : '✨' %></span>
+        <%= event.persisted? ? 'Edit Event' : 'Create New Event' %>
+      </h2>
+    </div>
+
+    <% if event.errors.any? %>
+      <div class="error-messages glass">
+        <div class="error-header">
+          <span class="error-icon">⚠️</span>
+          <h4 class="error-title"><%= pluralize(event.errors.count, "error") %> prohibited this event from being saved:</h4>
+        </div>
+        <ul class="error-list">
+          <% event.errors.full_messages.each do |message| %>
+            <li class="error-item"><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-content">
+      <div class="form-row">
+        <div class="form-group full-width">
+          <%= form.label :name, class: "form-label" do %>
+            <span class="label-icon">🎯</span>
+            <span class="label-text">Event Name *</span>
+          <% end %>
+          <%= form.text_field :name, 
+                              class: "form-input", 
+                              placeholder: "Enter event name...",
+                              required: true %>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group half-width">
+          <%= form.label :date, class: "form-label" do %>
+            <span class="label-icon">📅</span>
+            <span class="label-text">Event Date *</span>
+          <% end %>
+          <%= form.datetime_local_field :date, 
+                                        class: "form-input",
+                                        required: true %>
+        </div>
+        
+        <div class="form-group half-width">
+          <%= form.label :location, class: "form-label" do %>
+            <span class="label-icon">📍</span>
+            <span class="label-text">Location *</span>
+          <% end %>
+          <%= form.text_field :location, 
+                              class: "form-input", 
+                              placeholder: "Enter location...",
+                              required: true %>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <%= form.label :description, class: "form-label" do %>
+            <span class="label-icon">📝</span>
+            <span class="label-text">Description</span>
+          <% end %>
+          <%= form.text_area :description, 
+                             class: "form-textarea", 
+                             placeholder: "Enter event description (optional)...",
+                             rows: 4 %>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit event.persisted? ? 'Update Event' : 'Create Event', 
+                      class: "submit-btn" do %>
+        <span class="btn-icon"><%= event.persisted? ? '💾' : '✨' %></span>
+        <span class="btn-text"><%= event.persisted? ? 'Update Event' : 'Create Event' %></span>
+      <% end %>
+      
+      <%= link_to event.persisted? ? event_path(event) : events_path, 
+                  class: "cancel-btn" do %>
+        <span class="btn-icon">❌</span>
+        <span class="btn-text">Cancel</span>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .form-container {
+    min-height: calc(100vh - 120px);
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+    padding: 40px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .event-form {
+    max-width: 700px;
+    width: 100%;
+    padding: 40px;
+    position: relative;
+  }
+  
+  .form-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .form-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .form-icon {
+    font-size: 38px;
+  }
+  
+  .error-messages {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 12px;
+  }
+  
+  .error-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .error-icon {
+    font-size: 20px;
+  }
+  
+  .error-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f8d7da;
+    margin: 0;
+  }
+  
+  .error-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .error-item {
+    color: #f8d7da;
+    font-size: 14px;
+    padding: 4px 0;
+    padding-left: 30px;
+    position: relative;
+  }
+  
+  .error-item::before {
+    content: '•';
+    position: absolute;
+    left: 15px;
+    color: rgba(220, 53, 69, 0.8);
+  }
+  
+  .form-content {
+    margin-bottom: 40px;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group.full-width {
+    flex: 1;
+  }
+  
+  .form-group.half-width {
+    flex: 0.5;
+  }
+  
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+  
+  .label-icon {
+    font-size: 16px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+  
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: rgba(255, 193, 7, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+  }
+  
+  .form-input::placeholder,
+  .form-textarea::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  
+  .submit-btn {
+    background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+    color: #000;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+  }
+  
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 193, 7, 0.3);
+  }
+  
+  .cancel-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 20px 15px;
+    }
+    
+    .event-form {
+      padding: 30px 20px;
+    }
+    
+    .form-title {
+      font-size: 28px;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .form-group.half-width {
+      flex: 1;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+    
+    .submit-btn,
+    .cancel-btn {
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .form-title {
+      font-size: 24px;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .form-input,
+    .form-textarea {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+  }
+</style>

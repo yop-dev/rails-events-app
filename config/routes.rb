@@ -20,6 +20,13 @@ Rails.application.routes.draw do
   }
 
   # Admin namespace (protected area - ONLY the dashboard should be protected)
+  # Events management (for regular users)
+  resources :events do
+    resources :event_registrations, only: [:create], controller: 'registrations'
+  end
+  
+  resources :event_registrations, only: [:edit, :update, :destroy], controller: 'registrations'
+  
   namespace :admin do
     root 'dashboard#index'
   end

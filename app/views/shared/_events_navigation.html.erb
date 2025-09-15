@@ -1,0 +1,389 @@
+<div class="events-navigation glass">
+  <div class="nav-container">
+    <!-- Left Side Navigation -->
+    <div class="nav-left">
+      <% if current_page?(events_path) %>
+        <!-- On Events Index - Back to Main -->
+        <%= link_to root_path, class: "nav-btn back-btn" do %>
+          <span class="btn-icon">🏠</span>
+          <span class="btn-text">Back to Home</span>
+        <% end %>
+      <% elsif current_page?(new_event_path) %>
+        <!-- On New Event Form - Back to Events -->
+        <%= link_to events_path, class: "nav-btn back-btn" do %>
+          <span class="btn-icon">←</span>
+          <span class="btn-text">Back to Events</span>
+        <% end %>
+      <% elsif current_page?(edit_event_path(@event)) if defined?(@event) %>
+        <!-- On Edit Event Form - Back to Event -->
+        <%= link_to @event, class: "nav-btn back-btn" do %>
+          <span class="btn-icon">←</span>
+          <span class="btn-text">Back to Event</span>
+        <% end %>
+      <% elsif current_page?(event_path(@event)) if defined?(@event) %>
+        <!-- On Event Show - Back to Events -->
+        <%= link_to events_path, class: "nav-btn back-btn" do %>
+          <span class="btn-icon">←</span>
+          <span class="btn-text">Back to Events</span>
+        <% end %>
+      <% elsif defined?(@registration) && @registration.persisted? %>
+        <!-- On Edit Registration - Back to Event -->
+        <%= link_to @registration.event, class: "nav-btn back-btn" do %>
+          <span class="btn-icon">←</span>
+          <span class="btn-text">Back to Event</span>
+        <% end %>
+      <% else %>
+        <!-- Default - Back to Events -->
+        <%= link_to events_path, class: "nav-btn back-btn" do %>
+          <span class="btn-icon">←</span>
+          <span class="btn-text">Back to Events</span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Center - Page Title -->
+    <div class="nav-center">
+      <h1 class="nav-title">
+        <span class="title-icon">
+          <% if current_page?(events_path) %>
+            🎉
+          <% elsif current_page?(new_event_path) %>
+            ✨
+          <% elsif current_page?(edit_event_path(@event)) if defined?(@event) %>
+            ✏️
+          <% elsif current_page?(event_path(@event)) if defined?(@event) %>
+            🎯
+          <% elsif defined?(@registration) && @registration.persisted? %>
+            🎫
+          <% else %>
+            🎉
+          <% end %>
+        </span>
+        <span class="title-text">
+          <% if current_page?(events_path) %>
+            Events Management
+          <% elsif current_page?(new_event_path) %>
+            Create New Event
+          <% elsif current_page?(edit_event_path(@event)) if defined?(@event) %>
+            Edit Event
+          <% elsif current_page?(event_path(@event)) if defined?(@event) %>
+            <%= truncate(@event.name, length: 25) %>
+          <% elsif defined?(@registration) && @registration.persisted? %>
+            Edit Registration
+          <% else %>
+            Events
+          <% end %>
+        </span>
+      </h1>
+    </div>
+
+    <!-- Right Side Navigation -->
+    <div class="nav-right">
+      <!-- User Info & Actions -->
+      <div class="user-section">
+        <div class="user-info">
+          <div class="user-avatar">
+            <span class="avatar-text"><%= current_user.admin? ? '⚡' : '👤' %></span>
+          </div>
+          <div class="user-details">
+            <div class="user-name"><%= current_user.email.split('@').first.capitalize %></div>
+            <div class="user-role"><%= current_user.admin? ? 'Admin' : 'User' %></div>
+          </div>
+        </div>
+        
+        <div class="user-actions">
+          <% unless current_page?(events_path) %>
+            <%= link_to events_path, class: "nav-btn secondary", title: "All Events" do %>
+              <span class="btn-icon">📋</span>
+              <span class="btn-text hidden-mobile">Events</span>
+            <% end %>
+          <% end %>
+          
+          <% unless current_page?(new_event_path) %>
+            <%= link_to new_event_path, class: "nav-btn primary", title: "Create Event" do %>
+              <span class="btn-icon">✨</span>
+              <span class="btn-text hidden-mobile">Create</span>
+            <% end %>
+          <% end %>
+          
+          <%= link_to destroy_user_session_path, 
+                      data: { 
+                        turbo_method: :delete,
+                        turbo_confirm: "Are you sure you want to log out?" 
+                      },
+                      class: "nav-btn danger",
+                      title: "Sign Out" do %>
+            <span class="btn-icon">🚪</span>
+            <span class="btn-text hidden-mobile">Logout</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .events-navigation {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-bottom: 30px;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  
+  .nav-left,
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .nav-center {
+    flex: 1;
+    text-align: center;
+    min-width: 0; /* Allow text truncation */
+  }
+  
+  .nav-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  
+  .title-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  
+  .title-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+  }
+  
+  .nav-btn.back-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+  }
+  
+  .nav-btn.back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: translateX(-3px);
+  }
+  
+  .nav-btn.primary {
+    background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+    color: #000;
+    border-color: rgba(255, 193, 7, 0.3);
+  }
+  
+  .nav-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(255, 193, 7, 0.3);
+  }
+  
+  .nav-btn.secondary {
+    background: rgba(64, 64, 64, 0.3);
+    color: var(--text-secondary);
+  }
+  
+  .nav-btn.secondary:hover {
+    background: rgba(64, 64, 64, 0.5);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+  }
+  
+  .nav-btn.danger {
+    background: rgba(220, 53, 69, 0.2);
+    color: #f8d7da;
+    border-color: rgba(220, 53, 69, 0.3);
+  }
+  
+  .nav-btn.danger:hover {
+    background: rgba(220, 53, 69, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .user-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #000;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+  }
+  
+  .user-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+  
+  .user-role {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.2;
+  }
+  
+  .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .nav-container {
+      padding: 15px;
+    }
+    
+    .user-section {
+      gap: 15px;
+    }
+    
+    .hidden-mobile {
+      display: none;
+    }
+    
+    .nav-btn {
+      padding: 10px 12px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .nav-container {
+      flex-direction: column;
+      gap: 15px;
+      padding: 15px 10px;
+    }
+    
+    .nav-left,
+    .nav-right {
+      order: 2;
+    }
+    
+    .nav-center {
+      order: 1;
+    }
+    
+    .nav-title {
+      font-size: 20px;
+    }
+    
+    .title-text {
+      max-width: 200px;
+    }
+    
+    .user-info {
+      gap: 8px;
+    }
+    
+    .user-details {
+      display: none;
+    }
+    
+    .user-actions {
+      gap: 6px;
+    }
+    
+    .nav-btn {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .nav-container {
+      padding: 12px 8px;
+    }
+    
+    .nav-title {
+      font-size: 18px;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .title-icon {
+      font-size: 24px;
+    }
+    
+    .title-text {
+      font-size: 16px;
+      max-width: 150px;
+    }
+    
+    .user-section {
+      gap: 10px;
+    }
+    
+    .user-avatar {
+      width: 35px;
+      height: 35px;
+      font-size: 16px;
+    }
+    
+    .nav-btn {
+      padding: 6px 8px;
+    }
+  }
+</style>
