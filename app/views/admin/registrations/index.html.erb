@@ -960,6 +960,7 @@ document.addEventListener('turbo:load', function() {
   if (bulkForm) {
     bulkForm.addEventListener('submit', function(e) {
       e.preventDefault(); // Always prevent default first
+      e.stopPropagation(); // Stop event bubbling
       
       const checkedCheckboxes = document.querySelectorAll('.registration-checkbox:checked');
       const count = checkedCheckboxes.length;
@@ -968,7 +969,7 @@ document.addEventListener('turbo:load', function() {
       
       if (count === 0) {
         alert('Please select registrations to delete.');
-        return;
+        return false;
       }
       
       const message = count === 1 
@@ -976,9 +977,53 @@ document.addEventListener('turbo:load', function() {
         : `Are you sure you want to delete ${count} registrations? This action cannot be undone.`;
       
       if (confirm(message)) {
-        // Only submit if user confirms
-        bulkForm.submit();
+        // Disable individual delete buttons to prevent conflicts
+        document.querySelectorAll('.registration-actions .btn-danger, .action-buttons .btn-danger').forEach(btn => {
+          if (btn.id !== 'bulk-delete-btn') {
+            btn.style.pointerEvents = 'none';
+            btn.setAttribute('data-turbo', 'false');
+            btn.removeAttribute('data-turbo-confirm');
+            btn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+          }
+        });
+        
+        // Create a form element and submit it directly to avoid Turbo issues
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = bulkForm.action;
+        form.setAttribute('data-turbo', 'false');
+        
+        // Add method override for DELETE
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'delete';
+        form.appendChild(methodInput);
+        
+        // Add CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+          const tokenInput = document.createElement('input');
+          tokenInput.type = 'hidden';
+          tokenInput.name = 'authenticity_token';
+          tokenInput.value = csrfToken.content;
+          form.appendChild(tokenInput);
+        }
+        
+        // Add selected registration IDs
+        checkedCheckboxes.forEach(checkbox => {
+          const idInput = document.createElement('input');
+          idInput.type = 'hidden';
+          idInput.name = 'registration_ids[]';
+          idInput.value = checkbox.value;
+          form.appendChild(idInput);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
       }
+      
+      return false;
     });
   }
 
