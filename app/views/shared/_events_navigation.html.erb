@@ -3,10 +3,17 @@
     <!-- Left Side Navigation -->
     <div class="nav-left">
       <% if current_page?(events_path) %>
-        <!-- On Events Index - Back to Main -->
-        <%= link_to root_path, class: "nav-btn back-btn" do %>
-          <span class="btn-icon">🏠</span>
-          <span class="btn-text">Back to Home</span>
+        <!-- On Events Index - Back to Main/Admin Dashboard -->
+        <% if (defined?(current_admin_user) && current_admin_user) || (defined?(current_authenticated_user) && current_authenticated_user&.admin?) %>
+          <%= link_to admin_root_path, class: "nav-btn back-btn" do %>
+            <span class="btn-icon">🏠</span>
+            <span class="btn-text">Admin Dashboard</span>
+          <% end %>
+        <% else %>
+          <%= link_to root_path, class: "nav-btn back-btn" do %>
+            <span class="btn-icon">🏠</span>
+            <span class="btn-text">Back to Home</span>
+          <% end %>
         <% end %>
       <% elsif current_page?(new_event_path) %>
         <!-- On New Event Form - Back to Events -->
@@ -21,10 +28,17 @@
           <span class="btn-text">Back to Event</span>
         <% end %>
       <% elsif current_page?(event_path(@event)) if defined?(@event) %>
-        <!-- On Event Show - Back to Events -->
-        <%= link_to events_path, class: "nav-btn back-btn" do %>
-          <span class="btn-icon">←</span>
-          <span class="btn-text">Back to Events</span>
+        <!-- On Event Show - Back to Events (Admin or User) -->
+        <% if (defined?(current_admin_user) && current_admin_user) || (defined?(current_authenticated_user) && current_authenticated_user&.admin?) %>
+          <%= link_to admin_events_path, class: "nav-btn back-btn" do %>
+            <span class="btn-icon">←</span>
+            <span class="btn-text">Back to Events</span>
+          <% end %>
+        <% else %>
+          <%= link_to events_path, class: "nav-btn back-btn" do %>
+            <span class="btn-icon">←</span>
+            <span class="btn-text">Back to Events</span>
+          <% end %>
         <% end %>
       <% elsif defined?(@registration) && @registration.persisted? %>
         <!-- On Edit Registration - Back to Event -->
@@ -33,10 +47,17 @@
           <span class="btn-text">Back to Event</span>
         <% end %>
       <% else %>
-        <!-- Default - Back to Events -->
-        <%= link_to events_path, class: "nav-btn back-btn" do %>
-          <span class="btn-icon">←</span>
-          <span class="btn-text">Back to Events</span>
+        <!-- Default - Back to Events (Admin or User) -->
+        <% if (defined?(current_admin_user) && current_admin_user) || (defined?(current_authenticated_user) && current_authenticated_user&.admin?) %>
+          <%= link_to admin_events_path, class: "nav-btn back-btn" do %>
+            <span class="btn-icon">←</span>
+            <span class="btn-text">Back to Events</span>
+          <% end %>
+        <% else %>
+          <%= link_to events_path, class: "nav-btn back-btn" do %>
+            <span class="btn-icon">←</span>
+            <span class="btn-text">Back to Events</span>
+          <% end %>
         <% end %>
       <% end %>
     </div>
@@ -92,10 +113,17 @@
         </div>
         
         <div class="user-actions">
-          <% unless current_page?(events_path) %>
-            <%= link_to events_path, class: "nav-btn secondary", title: "All Events" do %>
-              <span class="btn-icon">📋</span>
-              <span class="btn-text hidden-mobile">Events</span>
+          <% unless current_page?(events_path) || current_page?(admin_events_path) %>
+            <% if (defined?(current_admin_user) && current_admin_user) || (defined?(current_authenticated_user) && current_authenticated_user&.admin?) %>
+              <%= link_to admin_events_path, class: "nav-btn secondary", title: "All Events" do %>
+                <span class="btn-icon">📋</span>
+                <span class="btn-text hidden-mobile">Events</span>
+              <% end %>
+            <% else %>
+              <%= link_to events_path, class: "nav-btn secondary", title: "All Events" do %>
+                <span class="btn-icon">📋</span>
+                <span class="btn-text hidden-mobile">Events</span>
+              <% end %>
             <% end %>
           <% end %>
           

@@ -1,7 +1,7 @@
 <%= render 'shared/events_navigation' %>
 
 <div class="form-container">
-  <%= form_with url: "/event_registrations/#{registration.id}", method: :patch, local: true, html: { class: "registration-form glass" } do |form| %>
+  <%= form_with url: "/event_registrations/#{registration.id}", method: :patch, local: true, html: { class: "registration-form glass", novalidate: true } do |form| %>
     <div class="form-header">
       <h2 class="form-title">
         <span class="form-icon">✏️</span>
@@ -27,29 +27,37 @@
     <div class="form-content">
       <div class="form-row">
         <div class="form-group">
-          <%= form.label :attendee_name, class: "form-label" do %>
+          <%= form.label "registration[attendee_name]", class: "form-label" do %>
             <span class="label-icon">👤</span>
             <span class="label-text">Full Name *</span>
           <% end %>
-          <%= form.text_field :attendee_name, 
+          <%= form.text_field "registration[attendee_name]", 
                               value: registration.attendee_name,
-                              class: "form-input", 
-                              placeholder: "Enter full name...",
-                              required: true %>
+                              class: "form-input #{'error' if registration.errors[:attendee_name].any?}", 
+                              placeholder: "Enter full name..." %>
+          <% if registration.errors[:attendee_name].any? %>
+            <div class="field-error">
+              <%= registration.errors[:attendee_name].first %>
+            </div>
+          <% end %>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <%= form.label :attendee_email, class: "form-label" do %>
+          <%= form.label "registration[attendee_email]", class: "form-label" do %>
             <span class="label-icon">📧</span>
             <span class="label-text">Email Address *</span>
           <% end %>
-          <%= form.email_field :attendee_email, 
+          <%= form.email_field "registration[attendee_email]", 
                                value: registration.attendee_email,
-                               class: "form-input", 
-                               placeholder: "Enter email address...",
-                               required: true %>
+                               class: "form-input #{'error' if registration.errors[:attendee_email].any?}", 
+                               placeholder: "Enter email address..." %>
+          <% if registration.errors[:attendee_email].any? %>
+            <div class="field-error">
+              <%= registration.errors[:attendee_email].first %>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>
@@ -71,6 +79,14 @@
     --text-secondary: #b8b8b8;
     --text-muted: #888888;
     --warning: #ffc107;
+  }
+  
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
   
   .form-container {
@@ -212,6 +228,26 @@
   
   .form-input::placeholder {
     color: var(--text-muted);
+  }
+  
+  .form-input.error {
+    border-color: rgba(220, 53, 69, 0.8);
+    background: rgba(220, 53, 69, 0.05);
+  }
+  
+  .form-input.error:focus {
+    border-color: rgba(220, 53, 69, 0.8);
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+  }
+  
+  .field-error {
+    color: #f8d7da;
+    font-size: 12px;
+    margin-top: 5px;
+    padding: 4px 8px;
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(220, 53, 69, 0.2);
   }
   
   .form-actions {

@@ -78,7 +78,7 @@
             title: "Export current results to CSV" %>
         
         <!-- Bulk Actions -->
-        <%= form_with url: bulk_destroy_admin_registrations_path, method: :delete, local: true, class: "bulk-form", data: { confirm: "Are you sure you want to delete selected registrations? This action cannot be undone." } do |form| %>
+        <%= form_with url: bulk_destroy_admin_registrations_path, method: :delete, local: true, class: "bulk-form" do |form| %>
           <button type="submit" class="btn btn-danger" id="bulk-delete-btn" disabled>
             Delete Selected
           </button>
@@ -360,12 +360,24 @@
   
   .filter-select {
     padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
-    color: var(--text-primary);
+    color: #333333;
     font-size: 14px;
     min-width: 160px;
+  }
+  
+  .filter-select option {
+    background: white;
+    color: #333333;
+    padding: 8px 12px;
+  }
+  
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--warning);
+    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
   }
   
   .action-controls {
@@ -737,6 +749,27 @@ document.addEventListener('DOMContentLoaded', function() {
         bulkForm.appendChild(hiddenInput);
       });
     }
+  }
+
+  // Handle bulk delete form submission with confirmation
+  if (bulkForm) {
+    bulkForm.addEventListener('submit', function(e) {
+      const checkedCheckboxes = document.querySelectorAll('.registration-checkbox:checked');
+      const count = checkedCheckboxes.length;
+      
+      if (count === 0) {
+        e.preventDefault();
+        return;
+      }
+      
+      const message = count === 1 
+        ? 'Are you sure you want to delete this registration? This action cannot be undone.' 
+        : `Are you sure you want to delete ${count} registrations? This action cannot be undone.`;
+      
+      if (!confirm(message)) {
+        e.preventDefault();
+      }
+    });
   }
 
   // Initialize states
