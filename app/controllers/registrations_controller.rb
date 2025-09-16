@@ -31,10 +31,10 @@ class RegistrationsController < ApplicationController
   end
 
   def destroy
-    event = @registration.event
+    @event = @registration.event
     ensure_event_owner_or_admin
     @registration.destroy
-    redirect_to event, notice: 'Registration was successfully deleted.'
+    redirect_to @event, notice: 'Registration was successfully deleted.'
   end
 
   private

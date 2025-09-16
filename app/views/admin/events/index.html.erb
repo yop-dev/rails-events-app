@@ -141,8 +141,10 @@
                     <div class="action-buttons">
                       <%= link_to "View", event_path(event), class: "btn btn-sm btn-primary" %>
                       <%= link_to "Delete", admin_event_path(event), 
-                          method: :delete,
-                          data: { confirm: "Are you sure? This will delete the event and all its registrations." },
+                          data: { 
+                            turbo_method: :delete,
+                            turbo_confirm: "Are you sure? This will delete the event and all its registrations." 
+                          },
                           class: "btn btn-sm btn-danger" %>
                     </div>
                   </td>
