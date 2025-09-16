@@ -6,7 +6,7 @@ class Event < ApplicationRecord
   validates :name, presence: true
   validates :date, presence: true
   validates :location, presence: true
-  # description is optional, no validation needed
+  validates :description, presence: { message: "Please provide a description for your event" }
   
   # Scopes
   scope :for_user, ->(user) { user.admin? ? all : where(user: user) }

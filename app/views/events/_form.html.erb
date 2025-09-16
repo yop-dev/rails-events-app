@@ -31,9 +31,14 @@
             <span class="label-text">Event Name *</span>
           <% end %>
           <%= form.text_field :name, 
-                              class: "form-input", 
+                              class: "form-input #{event.errors[:name].any? ? 'field-error' : ''}", 
                               placeholder: "Enter event name...",
                               required: true %>
+          <% if event.errors[:name].any? %>
+            <div class="field-error-message">
+              <%= event.errors[:name].first %>
+            </div>
+          <% end %>
         </div>
       </div>
 
@@ -44,8 +49,13 @@
             <span class="label-text">Event Date *</span>
           <% end %>
           <%= form.datetime_local_field :date, 
-                                        class: "form-input",
+                                        class: "form-input #{event.errors[:date].any? ? 'field-error' : ''}",
                                         required: true %>
+          <% if event.errors[:date].any? %>
+            <div class="field-error-message">
+              <%= event.errors[:date].first %>
+            </div>
+          <% end %>
         </div>
         
         <div class="form-group half-width">
@@ -54,9 +64,14 @@
             <span class="label-text">Location *</span>
           <% end %>
           <%= form.text_field :location, 
-                              class: "form-input", 
+                              class: "form-input #{event.errors[:location].any? ? 'field-error' : ''}", 
                               placeholder: "Enter location...",
                               required: true %>
+          <% if event.errors[:location].any? %>
+            <div class="field-error-message">
+              <%= event.errors[:location].first %>
+            </div>
+          <% end %>
         </div>
       </div>
 
@@ -64,12 +79,18 @@
         <div class="form-group full-width">
           <%= form.label :description, class: "form-label" do %>
             <span class="label-icon">📝</span>
-            <span class="label-text">Description</span>
+            <span class="label-text">Description *</span>
           <% end %>
           <%= form.text_area :description, 
-                             class: "form-textarea", 
-                             placeholder: "Enter event description (optional)...",
-                             rows: 4 %>
+                             class: "form-textarea #{event.errors[:description].any? ? 'field-error' : ''}", 
+                             placeholder: "Enter event description...",
+                             rows: 4,
+                             required: true %>
+          <% if event.errors[:description].any? %>
+            <div class="field-error-message">
+              <%= event.errors[:description].first %>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>
@@ -239,6 +260,26 @@
   .form-textarea {
     resize: vertical;
     min-height: 100px;
+  }
+  
+  .field-error {
+    border-color: rgba(220, 53, 69, 0.6) !important;
+    background: rgba(220, 53, 69, 0.05) !important;
+  }
+  
+  .field-error:focus {
+    border-color: rgba(220, 53, 69, 0.8) !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+  }
+  
+  .field-error-message {
+    color: #f8d7da;
+    font-size: 14px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid rgba(220, 53, 69, 0.6);
   }
   
   .form-actions {

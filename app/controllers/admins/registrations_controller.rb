@@ -1,5 +1,6 @@
 class Admins::RegistrationsController < Devise::RegistrationsController
-  ADMIN_SECRET_CODE = "ADMIN2025SECRET"
+  # Use environment variable with fallback for development/assessment
+  ADMIN_SECRET_CODE = ENV.fetch('ADMIN_SECRET_CODE', 'ADMIN2025SECRET')
 
   def create
     # Validate secret code

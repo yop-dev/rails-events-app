@@ -77,12 +77,12 @@
             class: "btn btn-success", 
             title: "Export current results to CSV" %>
         
-        <!-- Bulk Actions -->
-        <div class="bulk-actions">
-          <button type="submit" form="bulk-form" class="btn btn-danger" id="bulk-delete-btn" disabled>
+        <!-- Bulk Actions Form -->
+        <%= form_with url: bulk_destroy_admin_registrations_path, method: :delete, local: true, id: "bulk-form", class: "bulk-form" do |form| %>
+          <button type="submit" class="btn btn-danger" id="bulk-delete-btn" disabled>
             Delete Selected
           </button>
-        </div>
+        <% end %>
       </div>
     </div>
 
@@ -96,8 +96,7 @@
       </div>
       
       <% if @registrations.any? %>
-        <%= form_with url: bulk_destroy_admin_registrations_path, method: :delete, local: true, id: "bulk-form" do |form| %>
-          <div class="registrations-table-container">
+        <div class="registrations-table-container">
             <table class="registrations-table">
             <thead>
               <tr>
@@ -161,8 +160,7 @@
               <% end %>
             </tbody>
             </table>
-          </div>
-        <% end %>
+        </div>
       <% else %>
         <div class="empty-state">
           <div class="empty-icon">👥</div>
@@ -755,18 +753,34 @@ document.addEventListener('turbo:load', function() {
     console.log('Updating bulk button, selected:', checkedCheckboxes.length);
     
     bulkDeleteBtn.disabled = !hasSelection;
+    
+    // Update form with selected IDs
+    if (bulkForm) {
+      // Remove existing hidden inputs
+      bulkForm.querySelectorAll('input[name="registration_ids[]"]').forEach(input => input.remove());
+      
+      // Add new hidden inputs for selected registrations
+      checkedCheckboxes.forEach(checkbox => {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'registration_ids[]';
+        hiddenInput.value = checkbox.value;
+        bulkForm.appendChild(hiddenInput);
+      });
+    }
   }
 
   // Handle bulk delete form submission with confirmation
   if (bulkForm) {
     bulkForm.addEventListener('submit', function(e) {
+      e.preventDefault(); // Always prevent default first
+      
       const checkedCheckboxes = document.querySelectorAll('.registration-checkbox:checked');
       const count = checkedCheckboxes.length;
       
       console.log('Form submitted with', count, 'selections');
       
       if (count === 0) {
-        e.preventDefault();
         alert('Please select registrations to delete.');
         return;
       }
@@ -775,8 +789,9 @@ document.addEventListener('turbo:load', function() {
         ? 'Are you sure you want to delete this registration? This action cannot be undone.' 
         : `Are you sure you want to delete ${count} registrations? This action cannot be undone.`;
       
-      if (!confirm(message)) {
-        e.preventDefault();
+      if (confirm(message)) {
+        // Only submit if user confirms
+        bulkForm.submit();
       }
     });
   }

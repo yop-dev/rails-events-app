@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_15_090615) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_16_073900) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "events", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "date", null: false
