@@ -668,6 +668,9 @@
 
 <script>
 document.addEventListener('turbo:load', function() {
+  // Only run on admin events page
+  if (!document.querySelector('.admin-events') || !document.querySelector('.event-checkbox')) return;
+  
   // Select all functionality
   const selectAllCheckbox = document.getElementById('select-all');
   const eventCheckboxes = document.querySelectorAll('.event-checkbox');

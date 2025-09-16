@@ -697,6 +697,9 @@
 
 <script>
 document.addEventListener('turbo:load', function() {
+  // Only run on admin registrations page
+  if (!document.querySelector('.admin-registrations') || !document.querySelector('.registration-checkbox')) return;
+  
   console.log('Admin registrations page loaded');
   
   // Get elements
