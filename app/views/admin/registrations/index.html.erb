@@ -875,5 +875,18 @@ document.addEventListener('turbo:load', function() {
   // Initialize states
   updateSelectAllState();
   updateBulkDeleteButton();
+  
+  // Auto-submit form when event filter dropdown changes
+  const eventFilterDropdown = document.querySelector('.filter-select');
+  if (eventFilterDropdown) {
+    eventFilterDropdown.addEventListener('change', function() {
+      console.log('Event filter changed to:', this.value);
+      // Find the parent form and submit it
+      const form = this.closest('form');
+      if (form) {
+        form.submit();
+      }
+    });
+  }
 });
 </script>

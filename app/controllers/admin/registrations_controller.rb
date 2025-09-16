@@ -1,3 +1,5 @@
+require 'csv'
+
 class Admin::RegistrationsController < ApplicationController
   before_action :authenticate_admin_user!
   before_action :ensure_admin_role
@@ -92,40 +94,29 @@ class Admin::RegistrationsController < ApplicationController
   def export_registrations_to_csv(registrations, filename)
     Rails.logger.debug "Generating CSV for #{registrations.count} registrations"
     
-    # Generate CSV content manually without requiring CSV gem
-    csv_content = []
-    csv_content << "Event Name,Event Date,Event Location,Attendee Name,Attendee Email,Registration Date,Event Organizer"
-    
-    registrations.each do |registration|
-      row = [
-        registration.event.name,
-        registration.event.date.strftime('%Y-%m-%d %H:%M'),
-        registration.event.location,
-        registration.attendee_name,
-        registration.attendee_email,
-        registration.created_at.strftime('%Y-%m-%d %H:%M'),
-        registration.event.user.email
-      ]
-      # Escape any commas or quotes in the data
-      escaped_row = row.map { |field| escape_csv_field(field.to_s) }
-      csv_content << escaped_row.join(',')
+    csv_data = CSV.generate(headers: true) do |csv|
+      # Add header row
+      csv << ["Event Name", "Event Date", "Event Location", "Attendee Name", "Attendee Email", "Registration Date", "Event Organizer"]
+      
+      # Add data rows
+      registrations.each do |registration|
+        csv << [
+          registration.event.name,
+          registration.event.date.strftime('%Y-%m-%d %H:%M'),
+          registration.event.location,
+          registration.attendee_name,
+          registration.attendee_email,
+          registration.created_at.strftime('%Y-%m-%d %H:%M'),
+          registration.event.user.email
+        ]
+      end
     end
-
-    csv_data = csv_content.join("\n")
+    
     Rails.logger.debug "Generated CSV with #{csv_data.length} characters, filename: #{filename}"
     
     send_data csv_data, 
               filename: filename, 
               type: 'text/csv', 
               disposition: 'attachment'
-  end
-  
-  def escape_csv_field(field)
-    # If field contains comma, quote, or newline, wrap in quotes and escape internal quotes
-    if field.include?(',') || field.include?('"') || field.include?("\n")
-      '"' + field.gsub('"', '""') + '"'
-    else
-      field
-    end
   end
 end
