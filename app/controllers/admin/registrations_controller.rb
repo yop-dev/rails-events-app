@@ -54,6 +54,28 @@ class Admin::RegistrationsController < ApplicationController
     end
   end
 
+  def export_selected_csv
+    Rails.logger.debug "Export selected CSV called with params: #{params.inspect}"
+    Rails.logger.debug "Registration IDs: #{params[:registration_ids]}"
+    
+    if params[:registration_ids].present?
+      registrations = Registration.includes(:event).where(id: params[:registration_ids]).order(created_at: :desc)
+      Rails.logger.debug "Found #{registrations.count} registrations to export"
+      
+      if registrations.any?
+        export_registrations_to_csv(registrations, "selected_registrations_export_#{Date.current.strftime('%Y%m%d')}.csv")
+      else
+        redirect_to admin_registrations_path, alert: 'No valid registrations found for export.'
+      end
+    else
+      Rails.logger.debug "No registration IDs provided"
+      redirect_to admin_registrations_path, alert: 'No registrations selected for export.'
+    end
+  rescue => e
+    Rails.logger.error "Error exporting CSV: #{e.message}"
+    redirect_to admin_registrations_path, alert: 'An error occurred while exporting the CSV file.'
+  end
+
   private
 
   def ensure_admin_role
@@ -63,7 +85,12 @@ class Admin::RegistrationsController < ApplicationController
   end
 
   def export_to_csv
-    registrations = @registrations
+    filename = "registrations_export_#{Date.current.strftime('%Y%m%d')}.csv"
+    export_registrations_to_csv(@registrations, filename)
+  end
+
+  def export_registrations_to_csv(registrations, filename)
+    Rails.logger.debug "Generating CSV for #{registrations.count} registrations"
     
     # Generate CSV content manually without requiring CSV gem
     csv_content = []
@@ -84,8 +111,13 @@ class Admin::RegistrationsController < ApplicationController
       csv_content << escaped_row.join(',')
     end
 
-    filename = "registrations_export_#{Date.current.strftime('%Y%m%d')}.csv"
-    send_data csv_content.join("\n"), filename: filename, type: 'text/csv'
+    csv_data = csv_content.join("\n")
+    Rails.logger.debug "Generated CSV with #{csv_data.length} characters, filename: #{filename}"
+    
+    send_data csv_data, 
+              filename: filename, 
+              type: 'text/csv', 
+              disposition: 'attachment'
   end
   
   def escape_csv_field(field)

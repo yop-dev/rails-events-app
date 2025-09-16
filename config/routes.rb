@@ -37,6 +37,7 @@ Rails.application.routes.draw do
     resources :registrations, only: [:index, :destroy] do
       collection do
         delete :bulk_destroy
+        post :export_selected_csv
       end
     end
   end

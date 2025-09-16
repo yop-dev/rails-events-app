@@ -72,10 +72,20 @@
       
       <!-- Actions -->
       <div class="action-controls">
-        <!-- CSV Export -->
-        <%= link_to "Export CSV", admin_registrations_path(format: :csv, search: params[:search], event_id: params[:event_id]), 
-            class: "btn btn-success", 
-            title: "Export current results to CSV" %>
+        <!-- CSV Export Options -->
+        <div class="export-controls">
+          <!-- Export All (current behavior) -->
+          <%= link_to "Export All CSV", admin_registrations_path(format: :csv, search: params[:search], event_id: params[:event_id]), 
+              class: "btn btn-success", 
+              title: "Export all current results to CSV" %>
+          
+          <!-- Export Selected -->
+          <%= form_with url: export_selected_csv_admin_registrations_path, method: :post, local: true, id: "export-form", class: "export-form", data: { turbo: false } do |form| %>
+            <button type="submit" class="btn btn-success" id="export-selected-btn" disabled title="Export selected registrations to CSV">
+              Export Selected CSV
+            </button>
+          <% end %>
+        </div>
         
         <!-- Bulk Actions Form -->
         <%= form_with url: bulk_destroy_admin_registrations_path, method: :delete, local: true, id: "bulk-form", class: "bulk-form" do |form| %>
@@ -382,8 +392,19 @@
   
   .action-controls {
     display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .export-controls {
+    display: flex;
     gap: 10px;
     align-items: center;
+  }
+  
+  .export-form {
+    margin: 0;
   }
   
   .registrations-table-section {
@@ -707,12 +728,16 @@ document.addEventListener('turbo:load', function() {
   const registrationCheckboxes = document.querySelectorAll('.registration-checkbox');
   const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
   const bulkForm = document.getElementById('bulk-form');
+  const exportSelectedBtn = document.getElementById('export-selected-btn');
+  const exportForm = document.getElementById('export-form');
   
   console.log('Found elements:', {
     selectAll: !!selectAllCheckbox,
     checkboxCount: registrationCheckboxes.length,
     bulkBtn: !!bulkDeleteBtn,
-    bulkForm: !!bulkForm
+    bulkForm: !!bulkForm,
+    exportBtn: !!exportSelectedBtn,
+    exportForm: !!exportForm
   });
 
   // Select all functionality
@@ -748,16 +773,25 @@ document.addEventListener('turbo:load', function() {
   }
 
   function updateBulkDeleteButton() {
-    if (!bulkDeleteBtn) return;
-    
     const checkedCheckboxes = document.querySelectorAll('.registration-checkbox:checked');
     const hasSelection = checkedCheckboxes.length > 0;
     
-    console.log('Updating bulk button, selected:', checkedCheckboxes.length);
+    console.log('Updating buttons, selected:', checkedCheckboxes.length);
     
-    bulkDeleteBtn.disabled = !hasSelection;
+    // Update bulk delete button
+    if (bulkDeleteBtn) {
+      bulkDeleteBtn.disabled = !hasSelection;
+    }
     
-    // Update form with selected IDs
+    // Update export selected button
+    if (exportSelectedBtn) {
+      exportSelectedBtn.disabled = !hasSelection;
+      exportSelectedBtn.textContent = hasSelection 
+        ? `Export Selected CSV (${checkedCheckboxes.length})` 
+        : 'Export Selected CSV';
+    }
+    
+    // Update bulk delete form with selected IDs
     if (bulkForm) {
       // Remove existing hidden inputs
       bulkForm.querySelectorAll('input[name="registration_ids[]"]').forEach(input => input.remove());
@@ -769,6 +803,21 @@ document.addEventListener('turbo:load', function() {
         hiddenInput.name = 'registration_ids[]';
         hiddenInput.value = checkbox.value;
         bulkForm.appendChild(hiddenInput);
+      });
+    }
+    
+    // Update export form with selected IDs
+    if (exportForm) {
+      // Remove existing hidden inputs
+      exportForm.querySelectorAll('input[name="registration_ids[]"]').forEach(input => input.remove());
+      
+      // Add new hidden inputs for selected registrations
+      checkedCheckboxes.forEach(checkbox => {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'registration_ids[]';
+        hiddenInput.value = checkbox.value;
+        exportForm.appendChild(hiddenInput);
       });
     }
   }
@@ -796,6 +845,30 @@ document.addEventListener('turbo:load', function() {
         // Only submit if user confirms
         bulkForm.submit();
       }
+    });
+  }
+
+  // Handle export selected button click validation
+  if (exportSelectedBtn) {
+    exportSelectedBtn.addEventListener('click', function(e) {
+      const checkedCheckboxes = document.querySelectorAll('.registration-checkbox:checked');
+      const count = checkedCheckboxes.length;
+      
+      console.log('Export button clicked:', {
+        count: count,
+        hiddenInputs: exportForm?.querySelectorAll('input[name="registration_ids[]"]').length || 0
+      });
+      
+      if (count === 0) {
+        e.preventDefault();
+        alert('Please select registrations to export.');
+        return false;
+      }
+      
+      console.log(`Exporting ${count} registrations to CSV`);
+      console.log('Selected IDs:', Array.from(checkedCheckboxes).map(cb => cb.value));
+      // Allow form submission to proceed
+      return true;
     });
   }
 
