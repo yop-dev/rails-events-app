@@ -60,13 +60,11 @@
   </div>
   
   <!-- Page Title Section -->
-  <% unless current_page?(events_path) %>
+  <% unless current_page?(events_path) || current_page?(new_event_path) %>
     <% unless (defined?(@event) && @event&.persisted? && current_page?(edit_event_path(@event))) || (defined?(@event) && @event&.persisted? && current_page?(event_path(@event))) %>
       <div class="page-title-section">
         <h1 class="page-title">
-          <% if current_page?(new_event_path) %>
-            Create New Event
-          <% elsif defined?(@registration) && @registration.persisted? %>
+          <% if defined?(@registration) && @registration.persisted? %>
             Edit Registration
           <% else %>
             Events
